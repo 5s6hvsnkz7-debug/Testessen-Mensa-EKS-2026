@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anmeldung Testessen</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --cream: #faf6f1;
+      --warm: #f0e8dc;
+      --brown: #3d2b1f;
+      --brown-mid: #6b4c38;
+      --accent: #c0392b;
+      --accent-light: #e8d5d2;
+      --green: #2d6a4f;
+      --green-light: #d8f0e6;
+      --border: #d9cfc4;
+      --shadow: rgba(61,43,31,0.10);
+    }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: var(--cream);
+      color: var(--brown);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 4rem;
+      background-image:
+        radial-gradient(ellipse at 80% 10%, #eddfc8 0%, transparent 50%),
+        radial-gradient(ellipse at 10% 90%, #e2d5c3 0%, transparent 45%);
+    }
+    header {
+      text-align: center;
+      max-width: 560px;
+      width: 100%;
+      margin-bottom: 2.5rem;
+      padding-top: 1rem;
+    }
+    .kurs-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--brown-mid);
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 6vw, 2.8rem);
+      font-weight: 700;
+      color: var(--brown);
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+    }
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--brown-mid);
+      font-weight: 300;
+      line-height: 1.6;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 560px;
+      width: 100%;
+      box-shadow: 0 4px 24px var(--shadow);
+      margin-bottom: 1rem;
+    }
+    .plaetze-box {
+      background: var(--warm);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .plaetze-label { font-size: 0.85rem; font-weight: 500; color: var(--brown-mid); }
+    .plaetze-zahl {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--brown);
+      line-height: 1;
+    }
+    .plaetze-zahl span { font-size: 0.9rem; font-weight: 400; color: var(--brown-mid); }
+    .progress-bar-wrap { flex: 1; height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; border-radius: 99px; background: var(--accent); transition: width 0.5s ease; }
+    .section-title {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--brown-mid);
+      margin-bottom: 0.75rem;
+    }
+    .teilnehmer-liste { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.5rem; }
+    .teilnehmer-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      font-size: 0.95rem;
+      color: var(--brown);
+      padding: 0.5rem 0.75rem;
+      background: var(--cream);
+      border-radius: 8px;
+      animation: einblenden 0.35s ease;
+    }
+    .teilnehmer-info { display: flex; align-items: center; gap: 0.6rem; }
+    .teilnehmer-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; flex-shrink: 0; }
+    .teilnehmer-email { font-size: 0.78rem; color: var(--brown-mid); }
+    @keyframes einblenden { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+    .leer-hinweis { font-size: 0.9rem; color: var(--brown-mid); font-style: italic; padding: 0.5rem 0; }
+    .btn-loeschen {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-family: 'DM Sans', sans-serif;
+      padding: 0.3rem 0.6rem;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      white-space: nowrap;
+      display: none;
+    }
+    .btn-loeschen:hover { background: var(--accent-light); border-color: var(--accent); }
+    .admin-aktiv .btn-loeschen { display: inline-block; }
+    hr { border: none; border-top: 1px solid var(--border); margin-bottom: 1.5rem; }
+    .form-group { margin-bottom: 1.25rem; }
+    label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--brown-mid); margin-bottom: 0.4rem; }
+    input[type="text"], input[type="email"], input[type="password"] {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      color: var(--brown);
+      background: var(--cream);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus { border-color: var(--brown-mid); background: #fff; }
+    .btn {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--brown);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 0.5rem;
+    }
+    .btn:hover:not(:disabled) { background: var(--brown-mid); }
+    .btn:active:not(:disabled) { transform: scale(0.98); }
+    .btn:disabled { background: var(--border); color: var(--brown-mid); cursor: not-allowed; }
+    .btn-outline {
+      width: 100%;
+      padding: 0.75rem;
+      background: transparent;
+      color: var(--brown);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 0.5rem;
+    }
+    .btn-outline:hover { background: var(--warm); }
+    .btn-row { display: flex; gap: 0.75rem; margin-top: 0.75rem; }
+    .btn-row .btn, .btn-row .btn-outline { margin-top: 0; }
+    .meldung {
+      display: none;
+      padding: 0.8rem 1rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      font-weight: 500;
+    }
+    .meldung.erfolg { background: var(--green-light); color: var(--green); display: block; }
+    .meldung.fehler { background: var(--accent-light); color: var(--accent); display: block; }
+    .voll-banner {
+      display: none;
+      background: var(--accent-light);
+      border: 1.5px solid var(--accent);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      text-align: center;
+      color: var(--accent);
+      font-weight: 500;
+      margin-top: 1rem;
+    }
+    /* Admin-Bereich */
+    .admin-toggle {
+      max-width: 560px;
+      width: 100%;
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+    .admin-toggle button {
+      background: none;
+      border: none;
+      font-size: 0.78rem;
+      color: var(--brown-mid);
+      opacity: 0.5;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      text-decoration: underline;
+    }
+    .admin-toggle button:hover { opacity: 1; }
+    .admin-card {
+      display: none;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 560px;
+      width: 100%;
+      box-shadow: 0 4px 24px var(--shadow);
+      margin-top: 0.5rem;
+    }
+    .admin-card.sichtbar { display: block; }
+    .admin-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      margin-bottom: 1.25rem;
+      color: var(--brown);
+    }
+    footer { margin-top: 3rem; font-size: 0.78rem; color: var(--brown-mid); opacity: 0.6; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <p class="kurs-label">Einladung</p>
+    <h1>Testessen</h1>
+    <p class="subtitle">Wir freuen uns auf Ihre Teilnahme.<br>Maximal 6 Plätze verfügbar.</p>
+  </header>
+
+  <div class="card" id="hauptKarte">
+    <div class="plaetze-box">
+      <div>
+        <div class="plaetze-label">Freie Plätze</div>
+        <div class="plaetze-zahl" id="freiAnzeige">6 <span>von 6</span></div>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="teilnehmer-section">
+      <div class="section-title">Angemeldete Teilnehmer</div>
+      <ul class="teilnehmer-liste" id="teilnehmerListe">
+        <li class="leer-hinweis">Noch keine Anmeldungen.</li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <div id="formBereich">
+      <div class="section-title">Jetzt anmelden</div>
+      <div class="form-group">
+        <label for="nameInput">Ihr Name</label>
+        <input type="text" id="nameInput" placeholder="Vor- und Nachname" autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label for="emailInput">Ihre E-Mail-Adresse</label>
+        <input type="email" id="emailInput" placeholder="beispiel@email.de" autocomplete="email">
+      </div>
+      <button class="btn" onclick="anmelden()">Jetzt anmelden</button>
+      <div class="meldung" id="meldung"></div>
+    </div>
+
+    <div class="voll-banner" id="vollBanner">
+      🍽️ Alle 6 Plätze sind belegt.<br>Die Anmeldung ist geschlossen.
+    </div>
+  </div>
+
+  <!-- Admin-Link -->
+  <div class="admin-toggle">
+    <button onclick="toggleAdminLogin()">Verwaltung</button>
+  </div>
+
+  <!-- Admin Login -->
+  <div class="admin-card" id="adminLogin">
+    <div class="admin-title">Verwaltung</div>
+    <div class="form-group">
+      <label for="adminPw">Passwort</label>
+      <input type="password" id="adminPw" placeholder="Ihr Passwort" onkeydown="if(event.key==='Enter')adminLogin()">
+    </div>
+    <button class="btn" onclick="adminLogin()">Anmelden</button>
+    <div class="meldung" id="adminMeldung"></div>
+  </div>
+
+  <!-- Admin Panel -->
+  <div class="admin-card" id="adminPanel">
+    <div class="admin-title">Verwaltungsansicht</div>
+    <div class="section-title">Teilnehmerliste</div>
+    <ul class="teilnehmer-liste admin-aktiv" id="adminListe"></ul>
+    <div class="btn-row">
+      <button class="btn" onclick="exportCSV()">📥 Liste herunterladen (CSV)</button>
+      <button class="btn-outline" onclick="adminLogout()">Abmelden</button>
+    </div>
+  </div>
+
+  <footer>Diese Seite speichert Daten nur im Browser-Speicher dieses Geräts.</footer>
+
+  <script>
+    const MAX = 6;
+    const STORAGE_KEY = 'testessen_anmeldungen';
+    // *** Passwort hier ändern: ***
+    const ADMIN_PASSWORT = 'testessen2024';
+
+    function ladeDaten() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+      catch(e) { return []; }
+    }
+    function speichereDaten(l) { localStorage.setItem(STORAGE_KEY, JSON.stringify(l)); }
+    function escapeHtml(t) {
+      return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function aktualisiereAnzeige() {
+      const liste = ladeDaten();
+      const frei = MAX - liste.length;
+      document.getElementById('freiAnzeige').innerHTML = frei + ' <span>von ' + MAX + '</span>';
+      document.getElementById('progressBar').style.width = (liste.length / MAX * 100) + '%';
+
+      const ul = document.getElementById('teilnehmerListe');
+      ul.innerHTML = '';
+      if (liste.length === 0) {
+        ul.innerHTML = '<li class="leer-hinweis">Noch keine Anmeldungen.</li>';
+      } else {
+        liste.forEach(function(p) {
+          const li = document.createElement('li');
+          li.className = 'teilnehmer-item';
+          li.innerHTML = '<div class="teilnehmer-info"><span class="teilnehmer-dot"></span>' + escapeHtml(p.name) + '</div>';
+          ul.appendChild(li);
+        });
+      }
+
+      if (liste.length >= MAX) {
+        document.getElementById('formBereich').style.display = 'none';
+        document.getElementById('vollBanner').style.display = 'block';
+      } else {
+        document.getElementById('formBereich').style.display = 'block';
+        document.getElementById('vollBanner').style.display = 'none';
+      }
+
+      if (sessionStorage.getItem('admin') === '1') aktualisiereAdminListe();
+    }
+
+    function aktualisiereAdminListe() {
+      const liste = ladeDaten();
+      const ul = document.getElementById('adminListe');
+      ul.innerHTML = '';
+      if (liste.length === 0) {
+        ul.innerHTML = '<li class="leer-hinweis">Noch keine Anmeldungen.</li>';
+        return;
+      }
+      liste.forEach(function(p, i) {
+        const li = document.createElement('li');
+        li.className = 'teilnehmer-item';
+        li.innerHTML =
+          '<div class="teilnehmer-info">' +
+            '<span class="teilnehmer-dot"></span>' +
+            '<div><div>' + escapeHtml(p.name) + '</div>' +
+            '<div class="teilnehmer-email">' + escapeHtml(p.email) + '</div></div>' +
+          '</div>' +
+          '<button class="btn-loeschen" onclick="loeschen(' + i + ')">Entfernen</button>';
+        ul.appendChild(li);
+      });
+    }
+
+    function loeschen(index) {
+      const liste = ladeDaten();
+      const name = liste[index] ? liste[index].name : '';
+      if (!confirm('„' + name + '" wirklich aus der Liste entfernen?')) return;
+      liste.splice(index, 1);
+      speichereDaten(liste);
+      aktualisiereAnzeige();
+    }
+
+    function anmelden() {
+      const name = document.getElementById('nameInput').value.trim();
+      const email = document.getElementById('emailInput').value.trim();
+      const meldung = document.getElementById('meldung');
+      meldung.className = 'meldung';
+      meldung.style.display = 'none';
+
+      if (!name) { meldung.textContent = 'Bitte geben Sie Ihren Namen ein.'; meldung.className = 'meldung fehler'; return; }
+      if (!email || !email.includes('@')) { meldung.textContent = 'Bitte geben Sie eine gültige E-Mail-Adresse ein.'; meldung.className = 'meldung fehler'; return; }
+
+      const liste = ladeDaten();
+      if (liste.length >= MAX) { meldung.textContent = 'Leider sind alle Plätze belegt.'; meldung.className = 'meldung fehler'; aktualisiereAnzeige(); return; }
+      if (liste.some(function(p){ return p.email.toLowerCase() === email.toLowerCase(); })) {
+        meldung.textContent = 'Diese E-Mail-Adresse ist bereits angemeldet.'; meldung.className = 'meldung fehler'; return;
+      }
+
+      liste.push({ name: name, email: email });
+      speichereDaten(liste);
+      aktualisiereAnzeige();
+      document.getElementById('nameInput').value = '';
+      document.getElementById('emailInput').value = '';
+      meldung.textContent = '✓ Anmeldung erfolgreich! Wir freuen uns auf Sie.';
+      meldung.className = 'meldung erfolg';
+    }
+
+    function toggleAdminLogin() {
+      const login = document.getElementById('adminLogin');
+      const panel = document.getElementById('adminPanel');
+      if (sessionStorage.getItem('admin') === '1') {
+        panel.classList.toggle('sichtbar');
+      } else {
+        login.classList.toggle('sichtbar');
+      }
+    }
+
+    function adminLogin() {
+      const pw = document.getElementById('adminPw').value;
+      const m = document.getElementById('adminMeldung');
+      if (pw === ADMIN_PASSWORT) {
+        sessionStorage.setItem('admin', '1');
+        document.getElementById('adminLogin').classList.remove('sichtbar');
+        document.getElementById('adminPanel').classList.add('sichtbar');
+        aktualisiereAdminListe();
+        m.className = 'meldung';
+      } else {
+        m.textContent = 'Falsches Passwort.';
+        m.className = 'meldung fehler';
+      }
+    }
+
+    function adminLogout() {
+      sessionStorage.removeItem('admin');
+      document.getElementById('adminPanel').classList.remove('sichtbar');
+    }
+
+    function exportCSV() {
+      const liste = ladeDaten();
+      if (liste.length === 0) { alert('Keine Einträge vorhanden.'); return; }
+      let csv = 'Name,E-Mail\n';
+      liste.forEach(function(p) {
+        csv += '"' + p.name.replace(/"/g,'""') + '","' + p.email.replace(/"/g,'""') + '"\n';
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'testessen_anmeldungen.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && document.activeElement !== document.getElementById('adminPw')) anmelden();
+    });
+
+    aktualisiereAnzeige();
+  </script>
+</body>
+</html>
